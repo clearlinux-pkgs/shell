@@ -4,7 +4,7 @@
 #
 Name     : shell
 Version  : 1.0.1
-Release  : 2
+Release  : 3
 URL      : https://files.pythonhosted.org/packages/71/0c/d6270ed3bf86d036c37929443d7f4a7a8af77dbbce11cec7ddce8d8599c5/shell-1.0.1.tar.gz
 Source0  : https://files.pythonhosted.org/packages/71/0c/d6270ed3bf86d036c37929443d7f4a7a8af77dbbce11cec7ddce8d8599c5/shell-1.0.1.tar.gz
 Summary  : A better way to run shell commands in Python.
