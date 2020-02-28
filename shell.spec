@@ -4,25 +4,78 @@
 #
 Name     : shell
 Version  : 1.0.1
-Release  : 7
+Release  : 8
 URL      : https://files.pythonhosted.org/packages/71/0c/d6270ed3bf86d036c37929443d7f4a7a8af77dbbce11cec7ddce8d8599c5/shell-1.0.1.tar.gz
 Source0  : https://files.pythonhosted.org/packages/71/0c/d6270ed3bf86d036c37929443d7f4a7a8af77dbbce11cec7ddce8d8599c5/shell-1.0.1.tar.gz
 Summary  : A better way to run shell commands in Python.
 Group    : Development/Tools
 License  : BSD-3-Clause
-Requires: shell-python3
-Requires: shell-license
-Requires: shell-python
+Requires: shell-license = %{version}-%{release}
+Requires: shell-python = %{version}-%{release}
+Requires: shell-python3 = %{version}-%{release}
 BuildRequires : buildreq-distutils3
 
 %description
+=====
 shell
-        =====
-        
-        """A better way to run shell commands in Python."""
-        
-        Built because every time I go to use `subprocess`_, I spend more time in the
-        docs & futzing around than actually implementing what I'm trying to get done.
+=====
+
+"""A better way to run shell commands in Python."""
+
+Built because every time I go to use `subprocess`_, I spend more time in the
+docs & futzing around than actually implementing what I'm trying to get done.
+
+.. _`subprocess`: http://docs.python.org/2.7/library/subprocess.html
+
+Full docs are at https://shell.readthedocs.org/en/latest/.
+
+
+Requirements
+============
+
+* Python 2.6+ or Python 3.3+
+
+
+Usage
+=====
+
+If you just need to quickly run a command, you can use the ``shell`` shortcut
+function::
+
+    >>> from shell import shell
+    >>> ls = shell('ls')
+    >>> for file in ls.output():
+    ...     print file
+    'another.txt'
+
+If you need to extend the behavior, you can also use the ``Shell`` object::
+
+    >>> from shell import Shell
+    >>> sh = Shell(has_input=True)
+    >>> cat = sh.run('cat -u')
+    >>> cat.write('Hello, world!')
+    >>> cat.output()
+    ['Hello, world!']
+
+You can even chain calls if you'd like::
+
+    >>> from shell import shell
+    >>> shell('cat -u', has_input=True).write('Hello, world!').output()
+    ['Hello, world!']
+
+
+Installation
+============
+
+Using ``pip``, simply run::
+
+    pip install shell
+
+
+License
+=======
+
+New BSD
 
 %package license
 Summary: license components for the shell package.
@@ -45,6 +98,7 @@ python components for the shell package.
 Summary: python3 components for the shell package.
 Group: Default
 Requires: python3-core
+Provides: pypi(shell)
 
 %description python3
 python3 components for the shell package.
@@ -52,19 +106,28 @@ python3 components for the shell package.
 
 %prep
 %setup -q -n shell-1.0.1
+cd %{_builddir}/shell-1.0.1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1539122077
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1582922487
+# -Werror is for werrorists
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$CFLAGS -fno-lto "
+export FFLAGS="$CFLAGS -fno-lto "
+export CXXFLAGS="$CXXFLAGS -fno-lto "
+export MAKEFLAGS=%{?_smp_mflags}
 python3 setup.py build
 
 %install
+export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
-mkdir -p %{buildroot}/usr/share/doc/shell
-cp LICENSE %{buildroot}/usr/share/doc/shell/LICENSE
+mkdir -p %{buildroot}/usr/share/package-licenses/shell
+cp %{_builddir}/shell-1.0.1/LICENSE %{buildroot}/usr/share/package-licenses/shell/8d0f1b5adc97bb451ed19897389f9604037a650e
 python3 -tt setup.py build  install --root=%{buildroot}
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
@@ -75,7 +138,7 @@ echo ----[ mark ]----
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/doc/shell/LICENSE
+/usr/share/package-licenses/shell/8d0f1b5adc97bb451ed19897389f9604037a650e
 
 %files python
 %defattr(-,root,root,-)
